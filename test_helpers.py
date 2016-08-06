@@ -1,4 +1,4 @@
-def heuristicGen(list):
+def heuristic_gen(list):
     for num in list:
         yield num
     yield "Done generating"
@@ -9,7 +9,7 @@ if __name__ == "__main__":
 
         def test_heuristic(self):
             list_a = [1,2,3]
-            x = heuristicGen(list_a)
+            x = heuristic_gen(list_a)
             self.assertEqual(next(x), 1)
             self.assertEqual(next(x), 2)
             self.assertEqual(next(x), 3)
