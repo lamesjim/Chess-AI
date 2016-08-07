@@ -34,11 +34,22 @@ if __name__ == "__main__":
                           -1, -15, -12, -11, -1, 1, 17, -3, 12,
                           -7, 14, 9, 18, 4, -15, 8, 0, -6]
             first_test_AI = AI(4, 3, data_set_1)
-            self.assertEqual(first_test_AI.minimax(Node()), 8, "Should return 8")
-            data_set_2 = [-4, -17, 6, 10, -6, -1, 16, 12, -12,
-                          16, -18, -18, -20, -15, -18, -8, 8, 0,
-                          11, -14, 11, -20, 8, -2, -17, -18,
-                          -11, 10, -8, -14, 7, -17]
+            self.assertEqual(first_test_AI.minimax(Node()), 8, "Should return correct minimax when given b = 3 and d = 3")
+            data_set_2 = [-4, -17, 6, 10, -6, -1, 16, 12,
+                          -12, 16, -18, -18, -20, -15, -18, -8,
+                          8, 0, 11, -14, 11, -20, 8, -2,
+                          -17, -18, -11, 10, -8, -14, 7, -17]
             second_test_AI = AI(6, 2, data_set_2)
-            self.assertEqual(second_test_AI.minimax(Node()), -8, "Should return -8")
+            self.assertEqual(second_test_AI.minimax(Node()), -8, "Should return correct minimax when given b = 2 and d = 5")
+            data_set_3 = [-7, 14, -11, -16, -3, -19, 17, 0, 15,
+                          5, -12, 18, -12, 17, 11, 12, 5, -4,
+                          13, -12, 9, 0, 12, 12, -10, 1, -19,
+                          20, 6, 13, 9, 14, 7, -3, 4, 11,
+                          -14, -10, -13, -18, 17, -6, 0, -8, -1,
+                          3, 14, 6, -1, -7, 3, 8, 2, 10,
+                          6, -19, 15, -4, -10, -1, -19, -2, 6,
+                          -4, 14, -3, -9, -20, 11, -18, 15, -1,
+                          -9, -10, 15, 0, 8, -4, -12, 4, -17]
+            third_test_AI = AI(5, 3, data_set_3)
+            self.assertEqual(third_test_AI.minimax(Node()), -4, "Should return correct minimax when given b = 3 and d = 4")
     unittest.main()
