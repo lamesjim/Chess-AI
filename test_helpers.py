@@ -1,12 +1,14 @@
+from node import Node
+
 def heuristic_gen(list):
     for num in list:
         yield num
     yield "Done generating"
 
-def get_successors(value=None, n=3):
+def get_successors(n=3):
     successors = []
     for i in range(0, n):
-        successors.append(value)
+        successors.append(Node())
     return successors
 
 if __name__ == "__main__":
@@ -24,8 +26,9 @@ if __name__ == "__main__":
     class Test_get_successors(unittest.TestCase):
 
         def test_get_successors(self):
-            self.assertEqual(get_successors(), [None, None, None], "Should handle defaults")
-            self.assertEqual(get_successors("Dai", 5), ["Dai", "Dai", "Dai", "Dai", "Dai"], "Should print Daix5")
-            self.assertEqual(get_successors("James", 0), [], "Should print Jamesx0")
+            node_check = all(isinstance(successor, Node) for successor in get_successors(5))
+            self.assertEqual(len(get_successors()), 3, "Should handle defaults")
+            self.assertEqual(len(get_successors(0)), 0, "Should return 0")
+            self.assertEqual(node_check, True, "Should print a list of 5 nodes")
 
     unittest.main()
