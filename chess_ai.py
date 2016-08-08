@@ -38,20 +38,50 @@ class AI():
         return best_move
 
     def ab_make_move(self, node):
+        possible_moves = self.get_moves(node.board_state)
+        alpha = float("-inf")
+        beta = float("inf")
+        best_move = possible_moves[0]
+        for move in possible_moves:
+            board_value = self.ab_minimax(move, 1, alpha, beta)
+            if alpha < board_value:
+                alpha = board_value
+                best_move = move
+                best_move.value = alpha
+        # best_move at this point stores the move with the highest heuristic
+        return best_move
 
-
-    def ab_minimax(self, node, current_depth=0, alpha=float("-inf"), beta=float("inf")):
+    def ab_minimax(self, node, current_depth=0, alpha, beta):
         current_depth += 1
         if current_depth == self.max_depth:
-            # get heuristic of each node
-            node.value = self.get_heuristic(node.board_state)
-            return node.value
+            board_value = self.get_heuristic(node.board_state)
+            if current_depth % 2 == 0:
+                # pick largest number
+                if (alpha < board_value):
+                    alpha = board_value
+                return alpha
+            else:
+                # pick smallest number
+                if (beta > board_value):
+                    beta = board_value
+                return beta
         if current_depth % 2 == 0:
             # min player's turn
-            return min([self.minimax(child_node, current_depth) for child_node in self.get_moves(node.board_state)])
+            for child_node in self.get_moves(node.board_state):
+                if alpha < beta:
+                    board_value = self.ab_minimax(child_node, current_depth, alpha, beta)
+                    if beta > board_value:
+                        beta = board_value
+            return beta
+
         else:
             # max player's turn
-            return max([self.minimax(child_node, current_depth) for child_node in self.get_moves(node.board_state)])
+            for child_node in self.get_moves(node.board_state):
+                if alpha < beta:
+                    board_value = self.ab_minimax(child_node, current_depth, alpha, beta)
+                    if alpha < board_value:
+                        alpha = board_value
+            return alpha
 
 if __name__ == "__main__":
     import unittest
