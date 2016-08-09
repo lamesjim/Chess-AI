@@ -64,11 +64,12 @@ class AI():
             board_state = str(self.game)
         possible_moves = []
         for move in Game(board_state).get_moves():
-            clone = Game(board_state)
-            clone.apply_move(move)
-            node = Node(str(clone))
-            node.algebraic_move = move
-            possible_moves.append(node)
+            if (len(move) < 5 or move[4] == "q"):
+                clone = Game(board_state)
+                clone.apply_move(move)
+                node = Node(str(clone))
+                node.algebraic_move = move
+                possible_moves.append(node)
         return possible_moves
 
     def get_heuristic(self, board_state=None):
@@ -156,9 +157,9 @@ class AI():
                         alpha = board_value
             return alpha
 
-# if __name__ == "__main__":
-#     import unittest
-#     class Test_AI(unittest.TestCase):
+if __name__ == "__main__":
+    import unittest
+    class Test_AI(unittest.TestCase):
 #         # def test_minimax(self):
 #         #     data_set_1 = [8, 12, -13, 4, 1, 1, 20, 17, -5,
 #         #                   -1, -15, -12, -11, -1, 1, 17, -3, 12,
@@ -232,16 +233,16 @@ class AI():
 #         #     current_turn = str(new_game).split(" ")[1]
 #         #     self.assertEqual(current_turn, "w", "Should start as white's turn")
 #         #     self.assertEqual(len(first_test_AI.get_moves()), 21, "Should get all moves for white 3rd turn")
-#         def test_make_move(self):
-#             new_game = Game()
-#             first_test_AI = AI(new_game, 2, 0)
-#             first_test_AI.print_board(str(new_game))
-#             new_game.apply_move("a2a3")
-#             first_test_AI.print_board(str(new_game))
-#             new_game.apply_move(first_test_AI.ab_make_move(str(new_game)))
-#             first_test_AI.print_board(str(new_game))
-#
-#     unittest.main()
+    #     def test_make_move(self):
+    #         new_game = Game()
+    #         first_test_AI = AI(new_game, 2, 0)
+    #         first_test_AI.print_board(str(new_game))
+    #         new_game.apply_move("a2a3")
+    #         first_test_AI.print_board(str(new_game))
+    #         new_game.apply_move(first_test_AI.ab_make_move(str(new_game)))
+    #         first_test_AI.print_board(str(new_game))
+    #
+    # unittest.main()
 
-new_test = Test_Engine()
-new_test.prompt_user()
+# new_test = Test_Engine()
+# new_test.prompt_user()
