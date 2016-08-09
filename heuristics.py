@@ -28,6 +28,50 @@ def piece_moves(game, player_points, weight):
     player_points['b'] += black_points * weight
     return player_points
 
+def pawn_structure(board_state, player_points, weight):
+    board_state, current_player = [segment for segment in board_state.split()[:2]]
+    board_state = board_state.split("/")
+
+    # convert fen into matrix:
+    board_state_arr = []
+    for row in board_state:
+    	row_arr = []
+    	for char in row:
+    		if char.isdigit():
+    			for i in range(int(char)):
+    				row_arr.append(" ")
+    		else:
+    			row_arr.append(char)
+    	board_state_arr.append(row_arr)
+
+    # determine pawn to search for based on whose turn it is
+    pawn_color = None
+    white_points = 0
+    black_points = 0
+    for i, row in enumerate(board_state_arr):
+        for j in range(len(row)):
+            if board_state_arr[i][j] == "P":
+                bl = i+1, j-1
+                br = i+1, j+1
+                if bl[0] >= 0 and bl[0] <= 7 and bl[1] >= 0 and bl[1] <= 7:
+                    if board_state_arr[bl[0]][bl[1]] == "P":
+                        white_points += 1
+                if br[0] >= 0 and br[0] <= 7 and br[1] >= 0 and br[1] <= 7:
+                    if board_state_arr[br[0]][br[1]] == "P":
+                        white_points += 1
+            elif board_state_arr[i][j] == "p":
+                tl = i-1, j-1
+                tr = i-1, j+1
+                if tl[0] >= 0 and tl[0] <= 7 and tl[1] >= 0 and tl[1] <= 7:
+                    if board_state_arr[tl[0]][tl[1]] == "p":
+                        black_points += 1
+                if tr[0] >= 0 and tr[0] <= 7 and tr[1] >= 0 and tr[1] <= 7:
+                    if board_state_arr[tr[0]][tr[1]] == "p":
+                        black_points += 1
+    player_points['w'] += white_points * weight
+    player_points['b'] += black_points * weight
+    return player_points
+
 if __name__ == "__main__":
     import unittest
     class Test_material_heuristic(unittest.TestCase):
