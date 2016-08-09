@@ -46,7 +46,7 @@ class AI():
         if board_state == None:
             board_state = str(self.game)
         board_state = board_state.split()[0].split("/")
-        board_state_str = ""
+        board_state_str = "\n"
         for i, row in enumerate(board_state):
             board_state_str += str(8-i)
             for char in row:
