@@ -47,4 +47,8 @@ if __name__ == "__main__":
             new_game.apply_move("e7e6")
             game_state_2 = str(new_game)
             self.assertEqual(piece_moves(player_points_2, 0.50, game_state_2)['w'], 29, "Should return white player's sum of total weighted legal moves after pawn moves d2d3")
+
+        def test_center_squares(self):
+            new_game = Game()
+            
     unittest.main()
