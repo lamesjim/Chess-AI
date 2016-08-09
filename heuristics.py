@@ -40,6 +40,41 @@ def in_check(game, player_points, weight):
         player_points[opponent] += float("inf")
     return player_points
 
+def center_squares(game, player_points, weight):
+    # inner center squares - e4, e5, d4, d5
+    white_points = 0
+    black_points = 0
+    inner = [game.board.get_piece(game.xy2i("e4")),
+            game.board.get_piece(game.xy2i("e5")),
+            game.board.get_piece(game.xy2i("d4")),
+            game.board.get_piece(game.xy2i("d5"))]
+    for square in inner:
+        if square.isupper():
+            white_points += 3
+        elif square.islower():
+            black_points += 3
+    # outer center squares - c3, d3, e3, f3, c6, d6, e6, f6, f4, f5, c4, c5
+    outer = [game.board.get_piece(game.xy2i("c3")),
+            game.board.get_piece(game.xy2i("d3")),
+            game.board.get_piece(game.xy2i("e3")),
+            game.board.get_piece(game.xy2i("f3")),
+            game.board.get_piece(game.xy2i("c6")),
+            game.board.get_piece(game.xy2i("d6")),
+            game.board.get_piece(game.xy2i("e6")),
+            game.board.get_piece(game.xy2i("f6")),
+            game.board.get_piece(game.xy2i("f4")),
+            game.board.get_piece(game.xy2i("f5")),
+            game.board.get_piece(game.xy2i("c4")),
+            game.board.get_piece(game.xy2i("c5"))]
+    for square in outer:
+        if square.isupper():
+            white_points += 1
+        elif square.islower():
+            black_points += 1
+    player_points['w'] += white_points
+    player_points['b'] += black_points
+    return player_points
+
 if __name__ == "__main__":
     import unittest
     class Test_material_heuristic(unittest.TestCase):
@@ -77,5 +112,16 @@ if __name__ == "__main__":
             self.assertEqual(player_points['b'], 0, "Should not increment player_points when opponent not in check or checkmate")
             self.assertEqual(player_points['w'], float("inf"), "Should set player_points to infinity when opponent in checkmate")
 
+        def test_center_squares(self):
+            player_points = {'w': 0, 'b': 0}
+            #Initialized board
+            situation_a = Game()
+            center_squares(situation_a, player_points, 1)
+            self.assertEqual(player_points['b'], 0, "Should not have value since no piece is in any of the center squares")
+            self.assertEqual(player_points['w'], 0, "Should not have value since no piece is in any of the center squares")
+            situation_b = Game("r1bqkb1r/ppp1pppp/2n2n2/3p4/3PP3/2PQ4/PP3PPP/RNB1KBNR b KQkq e3 0 4")
+            center_squares(situation_b, player_points, 1)
+            self.assertEqual(player_points['b'], 5, "Should have points for 2 pieces in the outer square and 1 in the inner (5)")
+            self.assertEqual(player_points['w'], 8, "Should have points for 2 pieces in the outer square and 2 in the inner (8)")
 
     unittest.main()

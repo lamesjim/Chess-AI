@@ -77,8 +77,10 @@ class AI():
         clone = Game(board_state)
         player_points = {'w': 0, 'b': 0}
         # total piece count
-        heuristics.material(board_state, player_points, 0.50)
-        heuristics.piece_moves(clone, player_points, 0.50)
+        heuristics.material(board_state, player_points, 0.20)
+        heuristics.piece_moves(clone, player_points, 0.20)
+        heuristics.in_check(clone, player_points, 0.30)
+        heuristics.center_squares(clone, player_points, 0.30)
 
         return player_points
 
