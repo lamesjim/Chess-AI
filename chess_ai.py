@@ -30,18 +30,20 @@ class AI():
         self.game = game
 
     def print_board(self, board_state=None):
-        PIECE_SYMBOLS = {'p': '♟', 'b': '♝', 'n': '♞', 'r': '♜', 'q': '♛', 'k': '♚', 'P': '♙', 'B': '♗', 'N': '♘', 'R': '♖', 'Q': '♕', 'K': '♔'}
+        PIECE_SYMBOLS = {'P': '♟', 'B': '♝', 'N': '♞', 'R': '♜', 'Q': '♛', 'K': '♚', 'p': '♙', 'b': '♗', 'n': '♘', 'r': '♖', 'q': '♕', 'k': '♔'}
         if board_state == None:
             board_state = str(self.game)
         board_state = board_state.split()[0].split("/")
         board_state_str = ""
-        for row in board_state:
+        for i, row in enumerate(board_state):
+            board_state_str += str(8-i)
             for char in row:
                 if char.isdigit():
                     board_state_str += " –" * int(char)
                 else:
                     board_state_str += " " + PIECE_SYMBOLS[char]
             board_state_str += "\n"
+        board_state_str += "  A B C D E F G H"
 
         print(board_state_str)
 
