@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
-
+from subprocess import call
+from time import sleep
 from Chessnut import Game
 from test_helpers import heuristic_gen, get_successors
 from node import Node
 import heuristics
+import random
 
 class Test_Engine():
     def __init__(self):
@@ -11,12 +13,22 @@ class Test_Engine():
         self.computer = AI(self.game, 3)
 
     def prompt_user(self):
+        phrases = ["push me, and then just touch me, so i can get my, satisfaction...satisfaction",
+                    "Checkmate, you bish", "Hold your horses",
+                    "Thinking, thinking", "Hmmmmm...poor choice",
+                    "That was a dumb move", "Nice move...NOT!",
+                    "YOUR MOM SUCKS AT CHESS"]
         self.computer.print_board()
         while self.game.status < 2:
             user_move = raw_input("Make a move: ")
             while user_move not in self.game.get_moves():
                 user_move = raw_input("Please enter a valid move: ")
             self.game.apply_move(user_move)
+            self.computer.print_board()
+            print("\nCalcuating...\n")
+            sleep(2)
+            phrase = random.choice(phrases)
+            call(["say", "-v", "Ralph", phrase])
             if self.game.status < 2:
                 current_state = str(self.game)
                 computer_move = self.computer.ab_make_move(current_state)
@@ -47,23 +59,26 @@ class AI():
 
         print(board_state_str)
 
-    def get_moves(self, game_state=None):
-        if game_state == None:
-            game_state = str(self.game)
+    def get_moves(self, board_state=None):
+        if board_state == None:
+            board_state = str(self.game)
         possible_moves = []
-        for move in Game(game_state).get_moves():
-            clone = Game(game_state)
+        for move in Game(board_state).get_moves():
+            clone = Game(board_state)
             clone.apply_move(move)
             node = Node(str(clone))
             node.algebraic_move = move
             possible_moves.append(node)
         return possible_moves
 
-    def get_heuristic(self, board_state):
+    def get_heuristic(self, board_state=None):
+        if board_state == None:
+            board_state = str(self.game)
+        clone = Game(board_state)
         player_points = {'w': 0, 'b': 0}
         # total piece count
         heuristics.material(board_state, player_points, 0.50)
-        heuristics.piece_moves(player_points, 0.50, self.game)
+        heuristics.piece_moves(clone, player_points, 0.50)
 
         return player_points
 

@@ -14,15 +14,12 @@ def material(board_state, player_points, weight):
     player_points['b'] += black_points * weight
     return player_points
 
-def piece_moves(player_points, weight, game_state):
-    # if game_state == None:
-    #     game_state = str(self.game)
+def piece_moves(game, player_points, weight):
     piece_values = {'p': 1, 'b': 4, 'n': 4, 'r': 3, 'q': 3, 'k': 0, 'P': 1, 'B': 4, 'N': 4, 'R': 3, 'Q': 3, 'K': 0}
     white_points = 0
     black_points = 0
-    game_clone = Game(game_state)
-    for move in game_clone.get_moves():
-        current_piece = game_clone.board.get_piece(game_clone.xy2i(move[:2]))
+    for move in game.get_moves():
+        current_piece = game.board.get_piece(game.xy2i(move[:2]))
         if current_piece.isupper():
             white_points += piece_values[current_piece]
         elif current_piece.islower():
