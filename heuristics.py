@@ -28,6 +28,18 @@ def piece_moves(game, player_points, weight):
     player_points['b'] += black_points * weight
     return player_points
 
+def in_check(game, player_points, weight):
+    current_status = game.status
+    # Turn should be 'w' or 'b'
+    turn = str(game).split(" ")[1]
+    opponent = 'b' if turn == 'w' else 'w'
+    # Check or Checkmate situations
+    if current_status == 1:
+        player_points[opponent] += weight
+    elif current_status == 2:
+        player_points[opponent] += float("inf")
+    return player_points
+
 if __name__ == "__main__":
     import unittest
     class Test_material_heuristic(unittest.TestCase):
@@ -40,15 +52,29 @@ if __name__ == "__main__":
         def test_piece_moves_heuristics(self):
             player_points_1 = {'w': 0, 'b': 0}
             new_game = Game()
-            game_state_1 = str(new_game)
-            self.assertEqual(piece_moves(player_points_1, 0.50, game_state_1)['w'], 16, "Should return white player's sum of total weighted legal moves")
+            self.assertEqual(piece_moves(new_game, player_points_1, 0.50)['w'], 16, "Should return white player's sum of total weighted legal moves")
             player_points_2 = {'w': 0, 'b': 0}
             new_game.apply_move("d2d3")
             new_game.apply_move("e7e6")
-            game_state_2 = str(new_game)
-            self.assertEqual(piece_moves(player_points_2, 0.50, game_state_2)['w'], 29, "Should return white player's sum of total weighted legal moves after pawn moves d2d3")
+            self.assertEqual(piece_moves(new_game, player_points_2, 0.50)['w'], 29, "Should return white player's sum of total weighted legal moves after pawn moves d2d3")
 
-        def test_center_squares(self):
-            new_game = Game()
-            
+        def test_in_check(self):
+            player_points = {'w': 0, 'b': 0}
+            # Initialized Board
+            situation_a = Game()
+            in_check(situation_a, player_points, 1)
+            self.assertEqual(player_points['b'], 0, "Should not increment player_points when opponent not in check or checkmate")
+            self.assertEqual(player_points['w'], 0, "Should not increment player_points when opponent not in check or checkmate")
+            # Check situation
+            situation_b = Game("rnbqkbnr/ppp2ppp/8/1B1pp3/3PP3/8/PPP2PPP/RNBQK1NR b KQkq - 1 3")
+            in_check(situation_b, player_points, 1)
+            self.assertEqual(player_points['b'], 0, "Should not increment player_points when opponent not in check or checkmate")
+            self.assertEqual(player_points['w'], 1, "Should increment player_points when opponent is in check")
+
+            # Checkmate situation
+            situation_c = Game("r1bqkbnr/p1pppB1p/1pn2p2/6p1/8/1QP1P3/PP1P1PPP/RNB1K1NR b KQkq - 1 5")
+            in_check(situation_c, player_points, 1)
+            self.assertEqual(player_points['b'], 0, "Should not increment player_points when opponent not in check or checkmate")
+            self.assertEqual(player_points['w'], float("inf"), "Should set player_points to infinity when opponent in checkmate")
+
     unittest.main()
