@@ -1,6 +1,7 @@
 from Chessnut import Game
 from test_helpers import heuristic_gen, get_successors
 from node import Node
+import heuristics
 
 class AI():
     def __init__(self, game, max_depth=4, leaf_nodes=[]):
@@ -8,7 +9,7 @@ class AI():
         self.leaf_nodes = heuristic_gen(leaf_nodes)
         self.game = game
 
-    def __print(self, board_state):
+    def print_board(self, board_state):
         board_state = board_state.split()[0].split("/")
         board_state_str = ""
         for row in board_state:
@@ -27,16 +28,18 @@ class AI():
         possible_moves = []
         for move in Game(game_state).get_moves():
             clone = Game(game_state)
-            print(move)
             clone.apply_move(move)
             node = Node(str(clone))
+            node.algebraic_move = move
             possible_moves.append(node)
-        for move in possible_moves:
-            self.__print(move.board_state)
         return possible_moves
 
     def get_heuristic(self, board_state):
-        return next(self.leaf_nodes)
+        player_points = {'w': 0, 'b': 0}
+        # total piece count
+        heuristics.material(board_state, player_points)
+
+        return player_points
 
     def minimax(self, node, current_depth=0):
         current_depth += 1
@@ -65,9 +68,8 @@ class AI():
         # best_move at this point stores the move with the highest heuristic
         return best_move
 
-    def ab_make_move(self, node):
-        self.is_turn = True
-        possible_moves = self.get_moves(node.board_state)
+    def ab_make_move(self, board_state):
+        possible_moves = self.get_moves(board_state)
         alpha = float("-inf")
         beta = float("inf")
         best_move = possible_moves[0]
@@ -78,25 +80,26 @@ class AI():
                 best_move = move
                 best_move.value = alpha
         # best_move at this point stores the move with the highest heuristic
-        return best_move
+        return best_move.algebraic_move
 
     def ab_minimax(self, node, alpha, beta, current_depth=0):
         current_depth += 1
         if current_depth == self.max_depth:
-            board_value = self.get_heuristic(node.board_state)
+            total_value = self.get_heuristic(node.board_state)
             if current_depth % 2 == 0:
-                # pick largest number
+                # pick largest number, where root is black and even depth
+                board_value = total_value['b'] - total_value['w']
                 if (alpha < board_value):
                     alpha = board_value
                 return alpha
             else:
-                # pick smallest number
+                # pick smallest number, where root is black and odd depth
+                board_value = total_value['w'] - total_value['b']
                 if (beta > board_value):
                     beta = board_value
                 return beta
         if current_depth % 2 == 0:
             # min player's turn
-            self.is_turn = False
             for child_node in self.get_moves(node.board_state):
                 if alpha < beta:
                     board_value = self.ab_minimax(child_node,alpha, beta, current_depth)
@@ -105,7 +108,6 @@ class AI():
             return beta
         else:
             # max player's turn
-            self.is_turn = True
             for child_node in self.get_moves(node.board_state):
                 if alpha < beta:
                     board_value = self.ab_minimax(child_node,alpha, beta, current_depth)
@@ -172,22 +174,30 @@ if __name__ == "__main__":
         #     self.assertEqual(first_prune_test_ab_AI.ab_make_move(Node()).value, 8, "Should return correct number with pruning when given b = 3 and d = 3")
         #     self.assertEqual(first_unprune_test_ab_AI.ab_make_move(Node()).value == 8, False, "Should fail for unpruned dataset")
 
-        def test_get_moves(self):
+        # def test_get_moves(self):
+        #     new_game = Game()
+        #     first_test_AI = AI(new_game, 4, 0)
+        #     # White move
+        #     self.assertEqual(len(first_test_AI.get_moves()), 20, "Should get all initial moves for white")
+        #     current_turn = str(new_game).split(" ")[1]
+        #     self.assertEqual(current_turn, "w", "Should start as white's turn")
+        #     new_game.apply_move("a2a4")
+        #     # Black move
+        #     current_turn = str(new_game).split(" ")[1]
+        #     self.assertEqual(current_turn, "b", "Should switch to black's turn")
+        #     self.assertEqual(len(first_test_AI.get_moves()), 20, "Should get all initial moves for black")
+        #     new_game.apply_move("b8a6")
+        #     # White move
+        #     current_turn = str(new_game).split(" ")[1]
+        #     self.assertEqual(current_turn, "w", "Should start as white's turn")
+        #     self.assertEqual(len(first_test_AI.get_moves()), 21, "Should get all moves for white 3rd turn")
+        def test_make_move(self):
             new_game = Game()
-            first_test_AI = AI(new_game, 4, 0)
-            # White move
-            self.assertEqual(len(first_test_AI.get_moves()), 20, "Should get all initial moves for white")
-            current_turn = str(new_game).split(" ")[1]
-            self.assertEqual(current_turn, "w", "Should start as white's turn")
-            new_game.apply_move("a2a4")
-            # Black move
-            current_turn = str(new_game).split(" ")[1]
-            self.assertEqual(current_turn, "b", "Should switch to black's turn")
-            self.assertEqual(len(first_test_AI.get_moves()), 20, "Should get all initial moves for black")
-            new_game.apply_move("b8a6")
-            # White move
-            current_turn = str(new_game).split(" ")[1]
-            self.assertEqual(current_turn, "w", "Should start as white's turn")
-            self.assertEqual(len(first_test_AI.get_moves()), 21, "Should get all moves for white 3rd turn")
+            first_test_AI = AI(new_game, 2, 0)
+            first_test_AI.print_board(str(new_game))
+            new_game.apply_move("a2a3")
+            first_test_AI.print_board(str(new_game))
+            new_game.apply_move(first_test_AI.ab_make_move(str(new_game)))
+            first_test_AI.print_board(str(new_game))
 
     unittest.main()
