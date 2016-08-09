@@ -28,6 +28,50 @@ def piece_moves(game, player_points, weight):
     player_points['b'] += black_points * weight
     return player_points
 
+def pawn_structure(board_state, player_points, weight):
+    board_state, current_player = [segment for segment in board_state.split()[:2]]
+    board_state = board_state.split("/")
+
+    # convert fen into matrix:
+    board_state_arr = []
+    for row in board_state:
+    	row_arr = []
+    	for char in row:
+    		if char.isdigit():
+    			for i in range(int(char)):
+    				row_arr.append(" ")
+    		else:
+    			row_arr.append(char)
+    	board_state_arr.append(row_arr)
+
+    # determine pawn to search for based on whose turn it is
+    pawn_color = None
+    white_points = 0
+    black_points = 0
+    for i, row in enumerate(board_state_arr):
+        for j in range(len(row)):
+            if board_state_arr[i][j] == "P":
+                bl = i+1, j-1
+                br = i+1, j+1
+                if bl[0] >= 0 and bl[0] <= 7 and bl[1] >= 0 and bl[1] <= 7:
+                    if board_state_arr[bl[0]][bl[1]] == "P":
+                        white_points += 1
+                if br[0] >= 0 and br[0] <= 7 and br[1] >= 0 and br[1] <= 7:
+                    if board_state_arr[br[0]][br[1]] == "P":
+                        white_points += 1
+            elif board_state_arr[i][j] == "p":
+                tl = i-1, j-1
+                tr = i-1, j+1
+                if tl[0] >= 0 and tl[0] <= 7 and tl[1] >= 0 and tl[1] <= 7:
+                    if board_state_arr[tl[0]][tl[1]] == "p":
+                        black_points += 1
+                if tr[0] >= 0 and tr[0] <= 7 and tr[1] >= 0 and tr[1] <= 7:
+                    if board_state_arr[tr[0]][tr[1]] == "p":
+                        black_points += 1
+    player_points['w'] += white_points * weight
+    player_points['b'] += black_points * weight
+    return player_points
+
 def in_check(game, player_points, weight):
     current_status = game.status
     # Turn should be 'w' or 'b'
@@ -124,4 +168,16 @@ if __name__ == "__main__":
             self.assertEqual(player_points['b'], 5, "Should have points for 2 pieces in the outer square and 1 in the inner (5)")
             self.assertEqual(player_points['w'], 8, "Should have points for 2 pieces in the outer square and 2 in the inner (8)")
 
+        def test_pawn_structure_heuristic(self):
+            player_points_1 = {'w': 0, 'b': 0}
+            situation_1 = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+            self.assertEqual(pawn_structure(situation_1, player_points_1, 1)['w'], 0, "Should return value of white's pawn structure")
+            player_points_2 = {'w': 0, 'b': 0}
+            situation_2 = "rnbqkbnr/8/p1p1p1p1/1p1p1p1p/1P1P1P1P/P1P1P1P1/8/RNBQKBNR w KQkq - 0 9"
+            self.assertEqual(pawn_structure(situation_2, player_points_2, 1)['w'], 7, "Should return value of white's pawn structure")
+            player_points_3 = {'w': 0, 'b': 0}
+            situation_3 = "rnbqkbnr/pppp4/4pp2/P3P1pp/1P1P4/2P5/5PPP/RNBQKBNR b KQkq - 0 7"
+            pawn_structure(situation_3, player_points_3, 1)
+            self.assertEqual(player_points_3['w'], 4, "Should return value of white's pawn structure")
+            self.assertEqual(player_points_3['b'], 2, "Should return value of black's pawn structure")
     unittest.main()
