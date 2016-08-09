@@ -37,7 +37,8 @@ class AI():
     def get_heuristic(self, board_state):
         player_points = {'w': 0, 'b': 0}
         # total piece count
-        heuristics.material(board_state, player_points)
+        heuristics.material(board_state, player_points, 0.50)
+        heuristics.piece_moves(player_points, 0.50, self.game)
 
         return player_points
 
