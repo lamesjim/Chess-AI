@@ -1,4 +1,4 @@
-from Chessnut import Game
+from game import Game
 
 def material(board_state, weight):
     black_points = 0
