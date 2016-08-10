@@ -1,6 +1,7 @@
 from Chessnut import Game
 
-def material(board_state, black_points, weight):
+def material(board_state, weight):
+    black_points = 0
     board_state = board_state.split()[0]
     piece_values = {'p': 1, 'b': 3, 'n': 3, 'r': 5, 'q': 15, 'k': 0}
     for piece in board_state:
@@ -8,15 +9,22 @@ def material(board_state, black_points, weight):
             black_points += piece_values[piece]
     return black_points * weight
 
-def piece_moves(game, black_points, weight):
-    piece_values = {'p': 1, 'b': 4, 'n': 4, 'r': 3, 'q': 3, 'k': 0}
-    for move in game.get_moves():
-        current_piece = game.board.get_piece(game.xy2i(move[:2]))
-        if current_piece.islower():
-            black_points += piece_values[current_piece]
-    return black_points * weight
+def piece_moves(game, weight):
+    black_points = 0
+    turn = str(game).split()[1]
+    if turn == "b":
+        black_points += len(game.get_moves()) * weight
+    else:
+        black_points -= len(game.get_moves()) * weight
+    # piece_values = {'p': 1, 'b': 4, 'n': 4, 'r': 3, 'q': 3, 'k': 0}
+    # for move in game.get_moves():
+    #     current_piece = game.board.get_piece(game.xy2i(move[:2]))
+    #     if current_piece.islower():
+    #         black_points += piece_values[current_piece]
+    return black_points
 
-def pawn_structure(board_state, black_points, weight):
+def pawn_structure(board_state, weight):
+    black_points = 0
     board_state, current_player = [segment for segment in board_state.split()[:2]]
     board_state = board_state.split("/")
 
@@ -46,7 +54,8 @@ def pawn_structure(board_state, black_points, weight):
                         black_points += 1
     return black_points * weight
 
-def in_check(game, black_points, weight):
+def in_check(game, weight):
+    black_points = 0
     current_status = game.status
     # Turn should be 'w' or 'b'
     turn = str(game).split(" ")[1]
@@ -63,7 +72,8 @@ def in_check(game, black_points, weight):
             black_points += float("-inf")
     return black_points
 
-def center_squares(game, black_points, weight):
+def center_squares(game, weight):
+    black_points = 0
     # inner center squares - e4, e5, d4, d5
     inner = [game.board.get_piece(game.xy2i("e4")),
             game.board.get_piece(game.xy2i("e5")),
@@ -71,7 +81,7 @@ def center_squares(game, black_points, weight):
             game.board.get_piece(game.xy2i("d5"))]
     for square in inner:
         if square.islower():
-            black_points += 1000
+            black_points += 3
     # outer center squares - c3, d3, e3, f3, c6, d6, e6, f6, f4, f5, c4, c5
     outer = [game.board.get_piece(game.xy2i("c3")),
             game.board.get_piece(game.xy2i("d3")),
