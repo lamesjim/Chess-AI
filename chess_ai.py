@@ -23,6 +23,7 @@ class Test_Engine():
         while self.game.status < 2:
             user_move = raw_input("Make a move: ")
             while user_move not in self.game.get_moves():
+                print(self.game.get_moves())
                 user_move = raw_input("Please enter a valid move: ")
             self.game.apply_move(user_move)
             start_time = time.time()
