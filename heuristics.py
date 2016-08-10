@@ -7,6 +7,8 @@ def material(board_state, weight):
     for piece in board_state:
         if piece.islower():
             black_points += piece_values[piece]
+        elif piece.isupper():
+            black_points -= piece_values[piece.lower()]
     return black_points * weight
 
 def piece_moves(game, weight):
