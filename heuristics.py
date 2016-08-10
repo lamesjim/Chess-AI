@@ -1,34 +1,22 @@
 from Chessnut import Game
 
-def material(board_state, player_points, weight):
+def material(board_state, black_points, weight):
     board_state = board_state.split()[0]
-    piece_values = {'p': 1, 'b': 3, 'n': 3, 'r': 5, 'q': 15, 'k': 0, 'P': 1, 'B': 3, 'N': 3, 'R': 5, 'Q': 15, 'K': 0}
-    white_points = 0
-    black_points = 0
+    piece_values = {'p': 1, 'b': 3, 'n': 3, 'r': 5, 'q': 15, 'k': 0}
     for piece in board_state:
-        if piece.isupper():
-            white_points += piece_values[piece]
-        elif piece.islower():
+        if piece.islower():
             black_points += piece_values[piece]
-    player_points['w'] += white_points * weight
-    player_points['b'] += black_points * weight
-    return player_points
+    return black_points * weight
 
-def piece_moves(game, player_points, weight):
-    piece_values = {'p': 1, 'b': 4, 'n': 4, 'r': 3, 'q': 3, 'k': 0, 'P': 1, 'B': 4, 'N': 4, 'R': 3, 'Q': 3, 'K': 0}
-    white_points = 0
-    black_points = 0
+def piece_moves(game, black_points, weight):
+    piece_values = {'p': 1, 'b': 4, 'n': 4, 'r': 3, 'q': 3, 'k': 0}
     for move in game.get_moves():
         current_piece = game.board.get_piece(game.xy2i(move[:2]))
-        if current_piece.isupper():
-            white_points += piece_values[current_piece]
-        elif current_piece.islower():
+        if current_piece.islower():
             black_points += piece_values[current_piece]
-    player_points['w'] += white_points * weight
-    player_points['b'] += black_points * weight
-    return player_points
+    return black_points * weight
 
-def pawn_structure(board_state, player_points, weight):
+def pawn_structure(board_state, black_points, weight):
     board_state, current_player = [segment for segment in board_state.split()[:2]]
     board_state = board_state.split("/")
 
@@ -45,21 +33,9 @@ def pawn_structure(board_state, player_points, weight):
     	board_state_arr.append(row_arr)
 
     # determine pawn to search for based on whose turn it is
-    pawn_color = None
-    white_points = 0
-    black_points = 0
     for i, row in enumerate(board_state_arr):
         for j in range(len(row)):
-            if board_state_arr[i][j] == "P":
-                bl = i+1, j-1
-                br = i+1, j+1
-                if bl[0] >= 0 and bl[0] <= 7 and bl[1] >= 0 and bl[1] <= 7:
-                    if board_state_arr[bl[0]][bl[1]] == "P":
-                        white_points += 1
-                if br[0] >= 0 and br[0] <= 7 and br[1] >= 0 and br[1] <= 7:
-                    if board_state_arr[br[0]][br[1]] == "P":
-                        white_points += 1
-            elif board_state_arr[i][j] == "p":
+            if board_state_arr[i][j] == "p":
                 tl = i-1, j-1
                 tr = i-1, j+1
                 if tl[0] >= 0 and tl[0] <= 7 and tl[1] >= 0 and tl[1] <= 7:
@@ -68,35 +44,34 @@ def pawn_structure(board_state, player_points, weight):
                 if tr[0] >= 0 and tr[0] <= 7 and tr[1] >= 0 and tr[1] <= 7:
                     if board_state_arr[tr[0]][tr[1]] == "p":
                         black_points += 1
-    player_points['w'] += white_points * weight
-    player_points['b'] += black_points * weight
-    return player_points
+    return black_points * weight
 
-def in_check(game, player_points, weight):
+def in_check(game, black_points, weight):
     current_status = game.status
     # Turn should be 'w' or 'b'
     turn = str(game).split(" ")[1]
-    opponent = 'b' if turn == 'w' else 'w'
     # Check or Checkmate situations
-    if current_status == 1:
-        player_points[opponent] += weight
-    elif current_status == 2:
-        player_points[opponent] += float("inf")
-    return player_points
+    if turn == "w":
+        if current_status == 1:
+            black_points += 50 * weight
+        elif current_status == 2:
+            black_points += float("inf")
+    else:
+        if current_status == 1:
+            black_points -= 50 * weight
+        elif current_status == 2:
+            black_points += float("-inf")
+    return black_points
 
-def center_squares(game, player_points, weight):
+def center_squares(game, black_points, weight):
     # inner center squares - e4, e5, d4, d5
-    white_points = 0
-    black_points = 0
     inner = [game.board.get_piece(game.xy2i("e4")),
             game.board.get_piece(game.xy2i("e5")),
             game.board.get_piece(game.xy2i("d4")),
             game.board.get_piece(game.xy2i("d5"))]
     for square in inner:
-        if square.isupper():
-            white_points += 3
-        elif square.islower():
-            black_points += 3
+        if square.islower():
+            black_points += 1000
     # outer center squares - c3, d3, e3, f3, c6, d6, e6, f6, f4, f5, c4, c5
     outer = [game.board.get_piece(game.xy2i("c3")),
             game.board.get_piece(game.xy2i("d3")),
@@ -111,13 +86,9 @@ def center_squares(game, player_points, weight):
             game.board.get_piece(game.xy2i("c4")),
             game.board.get_piece(game.xy2i("c5"))]
     for square in outer:
-        if square.isupper():
-            white_points += 1
-        elif square.islower():
+        if square.islower():
             black_points += 1
-    player_points['w'] += white_points
-    player_points['b'] += black_points
-    return player_points
+    return black_points * weight
 
 if __name__ == "__main__":
     import unittest

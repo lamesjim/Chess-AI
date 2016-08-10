@@ -25,7 +25,7 @@ class Test_Engine():
                 user_move = raw_input("Please enter a valid move: ")
             self.game.apply_move(user_move)
             self.computer.print_board()
-            print("\nCalcuating...\n")
+            print("\nCalculating...\n")
             sleep(2)
             phrase = random.choice(phrases)
             call(["say", "-v", "Ralph", phrase])
@@ -36,10 +36,11 @@ class Test_Engine():
             self.computer.print_board()
 
 class AI():
-    def __init__(self, game, max_depth=4, leaf_nodes=[]):
+    def __init__(self, game, max_depth=4, leaf_nodes=[], node_count=0):
         self.max_depth = max_depth
         self.leaf_nodes = heuristic_gen(leaf_nodes)
         self.game = game
+        self.node_count = node_count
 
     def print_board(self, board_state=None):
         PIECE_SYMBOLS = {'P': '♟', 'B': '♝', 'N': '♞', 'R': '♜', 'Q': '♛', 'K': '♚', 'p': '♙', 'b': '♗', 'n': '♘', 'r': '♖', 'q': '♕', 'k': '♔'}
@@ -57,6 +58,8 @@ class AI():
             board_state_str += "\n"
         board_state_str += "  A B C D E F G H"
 
+        print self.node_count
+        self.node_count = 0
         print(board_state_str)
 
     def get_moves(self, board_state=None):
@@ -76,14 +79,14 @@ class AI():
         if board_state == None:
             board_state = str(self.game)
         clone = Game(board_state)
-        player_points = {'w': 0, 'b': 0}
+        black_points = 0
         # total piece count
-        heuristics.material(board_state, player_points, 0.20)
-        heuristics.piece_moves(clone, player_points, 0.20)
-        heuristics.in_check(clone, player_points, 0.30)
-        heuristics.center_squares(clone, player_points, 0.30)
-
-        return player_points
+        black_points += heuristics.material(board_state, black_points, 0.2)
+        black_points += heuristics.piece_moves(clone, black_points, 0.15)
+        black_points += heuristics.in_check(clone, black_points, 0.3)
+        black_points += heuristics.center_squares(clone, black_points, 0.15)
+        black_points += heuristics.pawn_structure(board_state, black_points, 0.2)
+        return black_points
 
     def minimax(self, node, current_depth=0):
         current_depth += 1
@@ -129,18 +132,18 @@ class AI():
     def ab_minimax(self, node, alpha, beta, current_depth=0):
         current_depth += 1
         if current_depth == self.max_depth:
-            total_value = self.get_heuristic(node.board_state)
+            board_value = self.get_heuristic(node.board_state)
             if current_depth % 2 == 0:
                 # pick largest number, where root is black and even depth
-                board_value = total_value['w'] - total_value['b']
                 if (alpha < board_value):
                     alpha = board_value
+                self.node_count += 1
                 return alpha
             else:
                 # pick smallest number, where root is black and odd depth
-                board_value = total_value['b'] - total_value['w']
                 if (beta > board_value):
                     beta = board_value
+                self.node_count += 1
                 return beta
         if current_depth % 2 == 0:
             # min player's turn
@@ -159,9 +162,9 @@ class AI():
                         alpha = board_value
             return alpha
 
-if __name__ == "__main__":
-    import unittest
-    class Test_AI(unittest.TestCase):
+# if __name__ == "__main__":
+#     import unittest
+#     class Test_AI(unittest.TestCase):
 #         # def test_minimax(self):
 #         #     data_set_1 = [8, 12, -13, 4, 1, 1, 20, 17, -5,
 #         #                   -1, -15, -12, -11, -1, 1, 17, -3, 12,
@@ -246,5 +249,5 @@ if __name__ == "__main__":
     #
     # unittest.main()
 
-# new_test = Test_Engine()
-# new_test.prompt_user()
+new_test = Test_Engine()
+new_test.prompt_user()
