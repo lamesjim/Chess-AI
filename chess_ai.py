@@ -6,6 +6,7 @@ from test_helpers import heuristic_gen, get_successors
 from node import Node
 import heuristics
 import random
+import time
 
 class Test_Engine():
     def __init__(self):
@@ -24,6 +25,7 @@ class Test_Engine():
             while user_move not in self.game.get_moves():
                 user_move = raw_input("Please enter a valid move: ")
             self.game.apply_move(user_move)
+            start_time = time.time()
             self.computer.print_board()
             print("\nCalculating...\n")
             # sleep(2)
@@ -32,9 +34,11 @@ class Test_Engine():
             if self.game.status < 2:
                 current_state = str(self.game)
                 computer_move = self.computer.ab_make_move(current_state)
-                print("Computer moved " + self.game.board.get_piece(self.game.xy2i(computer_move[:2])) + " at " + computer_move[:2] + " to " + computer_move[2:])
+                PIECE_NAME = {'p': 'Pawn', 'b': 'Bishop', 'n': 'Knight', 'r': 'Rook', 'q': 'Queen', 'k': 'King'}
+                print("Computer moved " + PIECE_NAME[self.game.board.get_piece(self.game.xy2i(computer_move[:2]))] + " at " + computer_move[:2] + " to " + computer_move[2:])
                 self.game.apply_move(computer_move)
             self.computer.print_board()
+            print("Elapsed time in sec: {time}".format(time=time.time() - start_time))
 
 class AI():
     def __init__(self, game, max_depth=4, leaf_nodes=[], node_count=0):
@@ -82,7 +86,7 @@ class AI():
         clone = Game(board_state)
         total_points = 0
         # total piece count
-        total_points += heuristics.material(board_state, 0.2)
+        total_points += heuristics.material(board_state, 3)
         total_points += heuristics.piece_moves(clone, 0.15)
         total_points += heuristics.in_check(clone, 0.3)
         total_points += heuristics.center_squares(clone, 0.15)
