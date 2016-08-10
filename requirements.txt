@@ -1,1 +1,7 @@
+backports-abc==0.4
+certifi==2016.8.8
 Chessnut==0.3.0
+singledispatch==3.4.0.3
+six==1.10.0
+snakeviz==0.4.1
+tornado==4.4.1
