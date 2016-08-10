@@ -13,11 +13,11 @@ class Test_Engine():
         self.computer = AI(self.game, 3)
 
     def prompt_user(self):
-        phrases = ["push me, and then just touch me, so i can get my, satisfaction...satisfaction",
-                    "Checkmate, you bish", "Hold your horses",
-                    "Thinking, thinking", "Hmmmmm...poor choice",
-                    "That was a dumb move", "Nice move...NOT!",
-                    "YOUR MOM SUCKS AT CHESS"]
+        # phrases = ["push me, and then just touch me, so i can get my, satisfaction...satisfaction",
+        #             "Checkmate, you bish", "Hold your horses",
+        #             "Thinking, thinking", "Hmmmmm...poor choice",
+        #             "That was a dumb move", "Nice move...NOT!",
+        #             "YOUR MOM SUCKS AT CHESS"]
         self.computer.print_board()
         while self.game.status < 2:
             user_move = raw_input("Make a move: ")
@@ -26,12 +26,13 @@ class Test_Engine():
             self.game.apply_move(user_move)
             self.computer.print_board()
             print("\nCalculating...\n")
-            sleep(2)
-            phrase = random.choice(phrases)
-            call(["say", "-v", "Ralph", phrase])
+            # sleep(2)
+            # phrase = random.choice(phrases)
+            # call(["say", "-v", "Ralph", phrase])
             if self.game.status < 2:
                 current_state = str(self.game)
                 computer_move = self.computer.ab_make_move(current_state)
+                print("Computer moved " + self.game.board.get_piece(self.game.xy2i(computer_move[:2])) + " at " + computer_move[:2] + " to " + computer_move[2:])
                 self.game.apply_move(computer_move)
             self.computer.print_board()
 
@@ -52,7 +53,7 @@ class AI():
             board_state_str += str(8-i)
             for char in row:
                 if char.isdigit():
-                    board_state_str += " –" * int(char)
+                    board_state_str += " ♢" * int(char)
                 else:
                     board_state_str += " " + PIECE_SYMBOLS[char]
             board_state_str += "\n"
@@ -79,14 +80,14 @@ class AI():
         if board_state == None:
             board_state = str(self.game)
         clone = Game(board_state)
-        black_points = 0
+        total_points = 0
         # total piece count
-        black_points += heuristics.material(board_state, black_points, 0.2)
-        black_points += heuristics.piece_moves(clone, black_points, 0.15)
-        black_points += heuristics.in_check(clone, black_points, 0.3)
-        black_points += heuristics.center_squares(clone, black_points, 0.15)
-        black_points += heuristics.pawn_structure(board_state, black_points, 0.2)
-        return black_points
+        total_points += heuristics.material(board_state, 0.2)
+        total_points += heuristics.piece_moves(clone, 0.15)
+        total_points += heuristics.in_check(clone, 0.3)
+        total_points += heuristics.center_squares(clone, 0.15)
+        total_points += heuristics.pawn_structure(board_state, 0.2)
+        return total_points
 
     def minimax(self, node, current_depth=0):
         current_depth += 1
