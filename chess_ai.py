@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from subprocess import call
 from time import sleep
-from Chessnut import Game
+from game import Game
 from test_helpers import heuristic_gen, get_successors
 from node import Node
 import heuristics
