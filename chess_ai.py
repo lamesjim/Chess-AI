@@ -58,7 +58,7 @@ class AI():
             board_state_str += "\n"
         board_state_str += "  A B C D E F G H"
 
-        print "Node Count: {}".format(self.node_count)
+        print("Node Count: {}".format(self.node_count))
         print("Cache size: {}".format(len(self.cache)))
         print("Found in Cache: {}".format(self.found_in_cache))
         self.found_in_cache = 0
