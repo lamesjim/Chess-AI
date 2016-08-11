@@ -3,7 +3,7 @@ from game import Game
 def material(board_state, weight):
     black_points = 0
     board_state = board_state.split()[0]
-    piece_values = {'p': 1, 'b': 3, 'n': 3, 'r': 5, 'q': 15, 'k': 0}
+    piece_values = {'p': 1, 'b': 3, 'n': 3, 'r': 5, 'q': 9, 'k': 0}
     for piece in board_state:
         if piece.islower():
             black_points += piece_values[piece]
@@ -14,10 +14,16 @@ def material(board_state, weight):
 def piece_moves(game, weight):
     black_points = 0
     turn = str(game).split()[1]
-    if turn == "b":
-        black_points += len(game.get_moves()) * weight
-    else:
-        black_points -= len(game.get_moves()) * weight
+    square_values = {"e4": 1, "e5": 1, "d4": 1, "d5": 1, "c6": 0.5, "d6": 0.5, "e6": 0.5, "f6": 0.5,
+                    "c3": 0.5, "d3": 0.5, "e3": 0.5, "f3": 0.5, "c4": 0.5, "c5": 0.5, "f4": 0.5, "f5": 0.5}
+    possible_moves = game.get_moves()
+    for move in possible_moves:
+        if turn == "b":
+            if move[2:4] in square_values:
+                black_points += square_values[move[2:4]]
+        else:
+            if move[2:4] in square_values:
+                black_points -= square_values[move[2:4]]
     # piece_values = {'p': 1, 'b': 4, 'n': 4, 'r': 3, 'q': 3, 'k': 0}
     # for move in game.get_moves():
     #     current_piece = game.board.get_piece(game.xy2i(move[:2]))
@@ -64,43 +70,43 @@ def in_check(game, weight):
     # Check or Checkmate situations
     if turn == "w":
         if current_status == 1:
-            black_points += 50 * weight
+            black_points += 1 * weight
         elif current_status == 2:
             black_points += float("inf")
     else:
         if current_status == 1:
-            black_points -= 50 * weight
+            black_points -= 1 * weight
         elif current_status == 2:
             black_points += float("-inf")
     return black_points
 
-def center_squares(game, weight):
-    black_points = 0
-    # inner center squares - e4, e5, d4, d5
-    inner = [game.board.get_piece(game.xy2i("e4")),
-            game.board.get_piece(game.xy2i("e5")),
-            game.board.get_piece(game.xy2i("d4")),
-            game.board.get_piece(game.xy2i("d5"))]
-    for square in inner:
-        if square.islower():
-            black_points += 3
-    # outer center squares - c3, d3, e3, f3, c6, d6, e6, f6, f4, f5, c4, c5
-    outer = [game.board.get_piece(game.xy2i("c3")),
-            game.board.get_piece(game.xy2i("d3")),
-            game.board.get_piece(game.xy2i("e3")),
-            game.board.get_piece(game.xy2i("f3")),
-            game.board.get_piece(game.xy2i("c6")),
-            game.board.get_piece(game.xy2i("d6")),
-            game.board.get_piece(game.xy2i("e6")),
-            game.board.get_piece(game.xy2i("f6")),
-            game.board.get_piece(game.xy2i("f4")),
-            game.board.get_piece(game.xy2i("f5")),
-            game.board.get_piece(game.xy2i("c4")),
-            game.board.get_piece(game.xy2i("c5"))]
-    for square in outer:
-        if square.islower():
-            black_points += 1
-    return black_points * weight
+# def center_squares(game, weight):
+#     black_points = 0
+#     # inner center squares - e4, e5, d4, d5
+#     inner = [game.board.get_piece(game.xy2i("e4")),
+#             game.board.get_piece(game.xy2i("e5")),
+#             game.board.get_piece(game.xy2i("d4")),
+#             game.board.get_piece(game.xy2i("d5"))]
+#     for square in inner:
+#         if square.islower():
+#             black_points += 3
+#     # outer center squares - c3, d3, e3, f3, c6, d6, e6, f6, f4, f5, c4, c5
+#     outer = [game.board.get_piece(game.xy2i("c3")),
+#             game.board.get_piece(game.xy2i("d3")),
+#             game.board.get_piece(game.xy2i("e3")),
+#             game.board.get_piece(game.xy2i("f3")),
+#             game.board.get_piece(game.xy2i("c6")),
+#             game.board.get_piece(game.xy2i("d6")),
+#             game.board.get_piece(game.xy2i("e6")),
+#             game.board.get_piece(game.xy2i("f6")),
+#             game.board.get_piece(game.xy2i("f4")),
+#             game.board.get_piece(game.xy2i("f5")),
+#             game.board.get_piece(game.xy2i("c4")),
+#             game.board.get_piece(game.xy2i("c5"))]
+#     for square in outer:
+#         if square.islower():
+#             black_points += 1
+#     return black_points * weight
 
 if __name__ == "__main__":
     import unittest
