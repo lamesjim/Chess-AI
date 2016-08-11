@@ -11,26 +11,20 @@ import time
 class Test_Engine():
     def __init__(self):
         self.game = Game()
-        self.computer = AI(self.game, 3)
+        self.computer = AI(self.game, 4)
 
     def prompt_user(self):
-        # phrases = ["push me, and then just touch me, so i can get my, satisfaction...satisfaction",
-        #             "Checkmate, you bish", "Hold your horses",
-        #             "Thinking, thinking", "Hmmmmm...poor choice",
-        #             "That was a dumb move", "Nice move...NOT!",
-        #             "YOUR MOM SUCKS AT CHESS"]
         self.computer.print_board()
         while self.game.status < 2:
             user_move = raw_input("Make a move: ")
-            while user_move not in self.game.get_moves():
+            while user_move not in self.game.get_moves() and user_move != "ff":
                 user_move = raw_input("Please enter a valid move: ")
+            if user_move == "ff":
+                break;
             self.game.apply_move(user_move)
             start_time = time.time()
             self.computer.print_board()
             print("\nCalculating...\n")
-            # sleep(2)
-            # phrase = random.choice(phrases)
-            # call(["say", "-v", "Ralph", phrase])
             if self.game.status < 2:
                 current_state = str(self.game)
                 computer_move = self.computer.ab_make_move(current_state)
@@ -39,6 +33,11 @@ class Test_Engine():
                 self.game.apply_move(computer_move)
             self.computer.print_board()
             print("Elapsed time in sec: {time}".format(time=time.time() - start_time))
+        user_move = raw_input("Game over. Play again? y/n: ")
+        if user_move.lower() == "y":
+            self.game = Game()
+            self.computer.game = self.game
+            self.prompt_user()
 
 class AI():
     def __init__(self, game, max_depth=4, leaf_nodes=[], node_count=0):
@@ -46,6 +45,8 @@ class AI():
         self.leaf_nodes = heuristic_gen(leaf_nodes)
         self.game = game
         self.node_count = node_count
+        self.cache = {}
+        self.found_in_cache = 0
 
     def print_board(self, board_state=None):
         PIECE_SYMBOLS = {'P': '♟', 'B': '♝', 'N': '♞', 'R': '♜', 'Q': '♛', 'K': '♚', 'p': '♙', 'b': '♗', 'n': '♘', 'r': '♖', 'q': '♕', 'k': '♔'}
@@ -63,7 +64,10 @@ class AI():
             board_state_str += "\n"
         board_state_str += "  A B C D E F G H"
 
-        print self.node_count
+        print("Node Count: {}".format(self.node_count))
+        print("Cache size: {}".format(len(self.cache)))
+        print("Found in Cache: {}".format(self.found_in_cache))
+        self.found_in_cache = 0
         self.node_count = 0
         print(board_state_str)
 
@@ -81,16 +85,21 @@ class AI():
         return possible_moves
 
     def get_heuristic(self, board_state=None):
+        cache_parse = board_state.split(" ")[0] + " " + board_state.split(" ")[1]
         if board_state == None:
             board_state = str(self.game)
+        if cache_parse in self.cache:
+            self.found_in_cache += 1
+            return self.cache[cache_parse]
         clone = Game(board_state)
         total_points = 0
         # total piece count
-        total_points += heuristics.material(board_state, 3)
+        total_points += heuristics.material(board_state, 0.6)
         total_points += heuristics.piece_moves(clone, 0.15)
-        total_points += heuristics.in_check(clone, 0.3)
-        total_points += heuristics.center_squares(clone, 0.15)
-        total_points += heuristics.pawn_structure(board_state, 0.2)
+        total_points += heuristics.in_check(clone, 0.1)
+        # total_points += heuristics.center_squares(clone, 0.2)
+        total_points += heuristics.pawn_structure(board_state, 0.15)
+        self.cache[cache_parse] = total_points
         return total_points
 
     def minimax(self, node, current_depth=0):
