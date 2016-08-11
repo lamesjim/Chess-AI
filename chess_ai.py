@@ -23,7 +23,6 @@ class Test_Engine():
         while self.game.status < 2:
             user_move = raw_input("Make a move: ")
             while user_move not in self.game.get_moves():
-                print(self.game.get_moves())
                 user_move = raw_input("Please enter a valid move: ")
             self.game.apply_move(user_move)
             start_time = time.time()
@@ -87,11 +86,11 @@ class AI():
         clone = Game(board_state)
         total_points = 0
         # total piece count
-        total_points += heuristics.material(board_state, 100)
+        total_points += heuristics.material(board_state, 3)
         total_points += heuristics.piece_moves(clone, 0.15)
-        total_points += heuristics.in_check(clone, 0.1)
-        # total_points += heuristics.center_squares(clone, 0.2)
-        total_points += heuristics.pawn_structure(board_state, 0.15)
+        total_points += heuristics.in_check(clone, 0.3)
+        total_points += heuristics.center_squares(clone, 0.15)
+        total_points += heuristics.pawn_structure(board_state, 0.2)
         return total_points
 
     def minimax(self, node, current_depth=0):
