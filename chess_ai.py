@@ -17,9 +17,10 @@ class Test_Engine():
         self.computer.print_board()
         while self.game.status < 2:
             user_move = raw_input("Make a move: ")
-            while user_move not in self.game.get_moves():
-                print(self.game.get_moves())
+            while user_move not in self.game.get_moves() and user_move != "ff":
                 user_move = raw_input("Please enter a valid move: ")
+            if user_move == "ff":
+                break;
             self.game.apply_move(user_move)
             start_time = time.time()
             self.computer.print_board()
@@ -32,6 +33,11 @@ class Test_Engine():
                 self.game.apply_move(computer_move)
             self.computer.print_board()
             print("Elapsed time in sec: {time}".format(time=time.time() - start_time))
+        user_move = raw_input("Game over. Play again? y/n: ")
+        if user_move.lower() == "y":
+            self.game = Game()
+            self.computer.game = self.game
+            self.prompt_user()
 
 class AI():
     def __init__(self, game, max_depth=4, leaf_nodes=[], node_count=0):
