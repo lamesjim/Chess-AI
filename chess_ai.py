@@ -8,15 +8,15 @@ import heuristics
 import random
 import time
 
-class bcolors:
-    HEADER = '\033[95m'
-    OKBLUE = '\033[94m'
-    OKGREEN = '\033[92m'
-    WARNING = '\033[93m'
-    FAIL = '\033[91m'
-    ENDC = '\033[0m'
-    BOLD = '\033[1m'
-    UNDERLINE = '\033[4m'
+
+# Magenta = '\033[95m'
+# Blue = '\033[94m'
+# Green = '\033[92m'
+# Yellow = '\033[93m'
+# Red = '\033[91m'
+# Clear = '\033[0m'
+# Bold = '\033[1m'
+# Underline = '\033[4m'
 
 class Test_Engine():
     def __init__(self):
@@ -25,17 +25,18 @@ class Test_Engine():
 
     def prompt_user(self):
         print("\033[94m\033[1m===================================================================")
-        print ("               ______________                     \n"
+        print ("\033[93m               ______________                     \n"
                "               __  ____/__  /_____________________\n"
                "               _  /    __  __ \  _ \_  ___/_  ___/\n"
                "               / /___  _  / / /  __/(__  )_(__  ) \n"
                "               \____/  /_/ /_/\___//____/ /____/  \n"
                "                                                  ")
-        print("===================================================================\033[0m\033[22m")
-        print("\nWelcome! To play, enter a command, e.g. 'e2e4'. To quit, type 'ff'.")
+        print("\033[94m===================================================================\033[0m\033[22m")
+        print("\nWelcome! To play, enter a command, e.g. '\033[95me2e4\033[0m'. To quit, type '\033[91mff\033[0m'.")
         self.computer.print_board(str(self.game))
         while self.game.status < 2:
-            user_move = raw_input("\nMake a move: ")
+            user_move = raw_input("\nMake a move: \033[95m")
+            print("\033[0m")
             while user_move not in self.game.get_moves() and user_move != "ff":
                 user_move = raw_input("Please enter a valid move: ")
             if user_move == "ff":
@@ -56,13 +57,17 @@ class Test_Engine():
                 captured_piece = self.game.board.get_piece(self.game.xy2i(computer_move[2:4]))
                 if captured_piece != " ":
                     captured_piece = PIECE_NAME[captured_piece.lower()]
-                    print("Computer's {piece} at {start} captured {captured_piece} at {end}.").format(piece = piece, start = start, captured_piece = captured_piece, end = end)
+                    print("---------------------------------")
+                    print("Computer's \033[92m{piece}\033[0m at \033[92m{start}\033[0m captured \033[91m{captured_piece}\033[0m at \033[91m{end}\033[0m.").format(piece = piece, start = start, captured_piece = captured_piece, end = end)
+                    print("---------------------------------")
                 else:
-                    print("Computer moved {piece} at {start} to {end}.".format(piece = piece, start = start, end = end))
-                print("Nodes visited: {}".format(self.computer.node_count))
-                print("Nodes cached: {}".format(len(self.computer.cache)))
-                print("Nodes found in cache: {}".format(self.computer.found_in_cache))
-                print("Elapsed time in sec: {time}".format(time=time.time() - start_time))
+                    print("---------------------------------")
+                    print("Computer moved \033[92m{piece}\033[0m at \033[92m{start}\033[0m to \033[92m{end}\033[0m.".format(piece = piece, start = start, end = end))
+                    print("---------------------------------")
+                print("\033[1mNodes visited:\033[0m        \033[93m{}\033[0m".format(self.computer.node_count))
+                print("\033[1mNodes cached:\033[0m         \033[93m{}\033[0m".format(len(self.computer.cache)))
+                print("\033[1mNodes found in cache:\033[0m \033[93m{}\033[0m".format(self.computer.found_in_cache))
+                print("\033[1mElapsed time in sec:\033[0m  \033[93m{time}\033[0m".format(time=time.time() - start_time))
                 self.game.apply_move(computer_move)
             captured = self.captured_pieces(str(self.game))
             self.computer.print_board(str(self.game), captured)
@@ -100,7 +105,18 @@ class AI():
         self.found_in_cache = 0
 
     def print_board(self, board_state, captured={"w": [], "b": []}):
-        PIECE_SYMBOLS = {'P': '♟', 'B': '♝', 'N': '♞', 'R': '♜', 'Q': '♛', 'K': '♚', 'p': '♙', 'b': '♗', 'n': '♘', 'r': '♖', 'q': '♕', 'k': '♔'}
+        PIECE_SYMBOLS = {'P': '♟',
+                        'B': '♝',
+                        'N': '♞',
+                        'R': '♜',
+                        'Q': '♛',
+                        'K': '♚',
+                        'p': '\033[36m\033[1m♙\033[0m',
+                        'b': '\033[36m\033[1m♗\033[0m',
+                        'n': '\033[36m\033[1m♘\033[0m',
+                        'r': '\033[36m\033[1m♖\033[0m',
+                        'q': '\033[36m\033[1m♕\033[0m',
+                        'k': '\033[36m\033[1m♔\033[0m'}
         board_state = board_state.split()[0].split("/")
         board_state_str = "\n"
         white_captured = " ".join(PIECE_SYMBOLS[piece] for piece in captured['w'])
