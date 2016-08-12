@@ -8,20 +8,30 @@ import heuristics
 import random
 import time
 
+class bcolors:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
+
 class Test_Engine():
     def __init__(self):
         self.game = Game()
         self.computer = AI(self.game, 4)
 
     def prompt_user(self):
-        print("===================================================================")
+        print("\033[94m\033[1m===================================================================")
         print ("               ______________                     \n"
                "               __  ____/__  /_____________________\n"
                "               _  /    __  __ \  _ \_  ___/_  ___/\n"
                "               / /___  _  / / /  __/(__  )_(__  ) \n"
                "               \____/  /_/ /_/\___//____/ /____/  \n"
                "                                                  ")
-        print("===================================================================")
+        print("===================================================================\033[0m\033[22m")
         print("\nWelcome! To play, enter a command, e.g. 'e2e4'. To quit, type 'ff'.")
         self.computer.print_board(str(self.game))
         while self.game.status < 2:
