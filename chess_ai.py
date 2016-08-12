@@ -14,9 +14,18 @@ class Test_Engine():
         self.computer = AI(self.game, 4)
 
     def prompt_user(self):
+        print("===================================================================")
+        print ("               ______________                     \n"
+               "               __  ____/__  /_____________________\n"
+               "               _  /    __  __ \  _ \_  ___/_  ___/\n"
+               "               / /___  _  / / /  __/(__  )_(__  ) \n"
+               "               \____/  /_/ /_/\___//____/ /____/  \n"
+               "                                                  ")
+        print("===================================================================")
+        print("\nWelcome! To play, enter a command, e.g. 'e2e4'. To quit, type 'ff'.")
         self.computer.print_board(str(self.game))
         while self.game.status < 2:
-            user_move = raw_input("Make a move: ")
+            user_move = raw_input("\nMake a move: ")
             while user_move not in self.game.get_moves() and user_move != "ff":
                 user_move = raw_input("Please enter a valid move: ")
             if user_move == "ff":
@@ -30,12 +39,23 @@ class Test_Engine():
             if self.game.status < 2:
                 current_state = str(self.game)
                 computer_move = self.computer.ab_make_move(current_state)
-                PIECE_NAME = {'p': 'Pawn', 'b': 'Bishop', 'n': 'Knight', 'r': 'Rook', 'q': 'Queen', 'k': 'King'}
-                print("Computer moved {piece} at {start} to {end}".format(piece = PIECE_NAME[self.game.board.get_piece(self.game.xy2i(computer_move[:2]))], start = computer_move[:2], end = computer_move[2:4]))
+                PIECE_NAME = {'p': 'pawn', 'b': 'bishop', 'n': 'knight', 'r': 'rook', 'q': 'queen', 'k': 'king'}
+                start = computer_move[:2]
+                end = computer_move[2:4]
+                piece = PIECE_NAME[self.game.board.get_piece(self.game.xy2i(computer_move[:2]))]
+                captured_piece = self.game.board.get_piece(self.game.xy2i(computer_move[2:4]))
+                if captured_piece != " ":
+                    captured_piece = PIECE_NAME[captured_piece.lower()]
+                    print("Computer's {piece} at {start} captured {captured_piece} at {end}.").format(piece = piece, start = start, captured_piece = captured_piece, end = end)
+                else:
+                    print("Computer moved {piece} at {start} to {end}.".format(piece = piece, start = start, end = end))
+                print("Nodes visited: {}".format(self.computer.node_count))
+                print("Nodes cached: {}".format(len(self.computer.cache)))
+                print("Nodes found in cache: {}".format(self.computer.found_in_cache))
+                print("Elapsed time in sec: {time}".format(time=time.time() - start_time))
                 self.game.apply_move(computer_move)
             captured = self.captured_pieces(str(self.game))
             self.computer.print_board(str(self.game), captured)
-            print("\nElapsed time in sec: {time}".format(time=time.time() - start_time))
         user_move = raw_input("Game over. Play again? y/n: ")
         if user_move.lower() == "y":
             self.game = Game()
@@ -92,10 +112,6 @@ class AI():
                 board_state_str += "   " + black_captured
             board_state_str += "\n"
         board_state_str += "  A B C D E F G H"
-
-        print("Node Count: {}".format(self.node_count))
-        print("Cache size: {}".format(len(self.cache)))
-        print("Found in Cache: {}".format(self.found_in_cache))
         self.found_in_cache = 0
         self.node_count = 0
         print(board_state_str)
