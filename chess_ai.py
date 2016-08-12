@@ -20,6 +20,7 @@ class Test_Engine():
             while user_move not in self.game.get_moves() and user_move != "ff":
                 user_move = raw_input("Please enter a valid move: ")
             if user_move == "ff":
+                print("You surrendered.")
                 break;
             self.game.apply_move(user_move)
             start_time = time.time()
@@ -29,7 +30,7 @@ class Test_Engine():
                 current_state = str(self.game)
                 computer_move = self.computer.ab_make_move(current_state)
                 PIECE_NAME = {'p': 'Pawn', 'b': 'Bishop', 'n': 'Knight', 'r': 'Rook', 'q': 'Queen', 'k': 'King'}
-                print("Computer moved " + PIECE_NAME[self.game.board.get_piece(self.game.xy2i(computer_move[:2]))] + " at " + computer_move[:2] + " to " + computer_move[2:])
+                print("Computer moved {piece} at {start} to {end}".format(piece = PIECE_NAME[self.game.board.get_piece(self.game.xy2i(computer_move[:2]))], start = computer_move[:2], end = computer_move[2:4]))
                 self.game.apply_move(computer_move)
             self.computer.print_board()
             print("Elapsed time in sec: {time}".format(time=time.time() - start_time))
@@ -94,11 +95,10 @@ class AI():
         clone = Game(board_state)
         total_points = 0
         # total piece count
-        total_points += heuristics.material(board_state, 0.6)
-        total_points += heuristics.piece_moves(clone, 0.15)
-        total_points += heuristics.in_check(clone, 0.1)
-        # total_points += heuristics.center_squares(clone, 0.2)
-        total_points += heuristics.pawn_structure(board_state, 0.15)
+        total_points += heuristics.material(board_state, 3)
+        total_points += heuristics.piece_moves(clone, 1)
+        total_points += heuristics.in_check(clone, 1)
+        total_points += heuristics.pawn_structure(board_state, 1)
         self.cache[cache_parse] = total_points
         return total_points
 
