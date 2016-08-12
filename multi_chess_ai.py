@@ -8,6 +8,7 @@ import heuristics
 import random
 import time
 from multiprocessing import Pool
+import math
 
 cache = {}
 found_in_cache = 0
@@ -105,7 +106,6 @@ class AI():
         total_points += heuristics.in_check(clone, 0.1)
         # total_points += heuristics.center_squares(clone, 0.2)
         total_points += heuristics.pawn_structure(board_state, 0.15)
-        print(len(cache))
         cache[cache_parse] = total_points
         return total_points
 
@@ -142,12 +142,14 @@ class AI():
         best_move = None
 
         p = Pool(4)
-        p = p.map(map_partial, possible_moves)
-        for node in p:
+        result = p.map(map_partial, possible_moves)
+        for node in result:
             if best_move == None:
                 best_move = node
             if best_move.value < node.value:
                 best_move = node
+        p.close()
+        p.join()
         return best_move.algebraic_move
 
     def ab_minimax(self, node, alpha=float("-inf"), beta=float("inf"), current_depth=1):

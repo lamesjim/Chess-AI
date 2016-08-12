@@ -95,11 +95,10 @@ class AI():
         clone = Game(board_state)
         total_points = 0
         # total piece count
-        total_points += heuristics.material(board_state, 0.6)
-        total_points += heuristics.piece_moves(clone, 0.15)
-        total_points += heuristics.in_check(clone, 0.1)
-        # total_points += heuristics.center_squares(clone, 0.2)
-        total_points += heuristics.pawn_structure(board_state, 0.15)
+        total_points += heuristics.material(board_state, 3)
+        total_points += heuristics.piece_moves(clone, 1)
+        total_points += heuristics.in_check(clone, 1)
+        total_points += heuristics.pawn_structure(board_state, 1)
         self.cache[cache_parse] = total_points
         return total_points
 
