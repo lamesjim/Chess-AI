@@ -20,11 +20,7 @@ class Board(object):
         Convert the piece placement array to a FEN string.
         """
         pos = []
-        stripped = []
-        for char in self._position:
-            if char != "/":
-                stripped.append(char)
-        for idx, piece in enumerate(stripped):
+        for idx, piece in enumerate(self._position):
 
             # add a '/' at the end of each row
             if idx > 0 and idx % 8 == 0:
