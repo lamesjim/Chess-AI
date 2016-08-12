@@ -7,6 +7,9 @@ from node import Node
 import heuristics
 import random
 import time
+import shelve
+
+chess_shelve = shelve.open('moves', 'writeback=True')
 
 class Test_Engine():
     def __init__(self):
@@ -66,7 +69,10 @@ class AI():
         board_state_str += "  A B C D E F G H"
 
         print("Node Count: {}".format(self.node_count))
-        print("Cache size: {}".format(len(self.cache)))
+        # if self.max_depth % 2 == 0:
+        #     print("Cache size: {}".format(len(shelve['even'])))
+        # else:
+        #     print("Cache size: {}".format(len(shelve['odd'])))
         print("Found in Cache: {}".format(self.found_in_cache))
         self.found_in_cache = 0
         self.node_count = 0
@@ -89,17 +95,31 @@ class AI():
         cache_parse = board_state.split(" ")[0] + " " + board_state.split(" ")[1]
         if board_state == None:
             board_state = str(self.game)
+        # uncomment when ready to read from shelve
+        if self.max_depth % 2 == 0:
+            if cache_parse in chess_shelve['even']:
+                self.found_in_cache += 1
+                return chess_shelve['even'][cache_parse]
+        # else:
+    #         if cache_parse in chess_shelve_odd:
+    #             self.found_in_cache += 1
+    #             return chess_shelve_odd[cache_parse]
         if cache_parse in self.cache:
             self.found_in_cache += 1
             return self.cache[cache_parse]
         clone = Game(board_state)
         total_points = 0
         # total piece count
-        total_points += heuristics.material(board_state, 3)
-        total_points += heuristics.piece_moves(clone, 1)
-        total_points += heuristics.in_check(clone, 1)
-        total_points += heuristics.pawn_structure(board_state, 1)
+        total_points += heuristics.material(board_state, 75)
+        total_points += heuristics.piece_moves(clone, 35)
+        total_points += heuristics.in_check(clone, 10)
+        total_points += heuristics.pawn_structure(board_state, 25)
         self.cache[cache_parse] = total_points
+        if self.max_depth % 2 == 0:
+            chess_shelve['even'] = self.cache
+        else:
+            chess_shelve['odd'] = self.cache
+        # print(chess_shelve['even'])
         return total_points
 
     def minimax(self, node, current_depth=0):
@@ -265,3 +285,6 @@ class AI():
 
 new_test = Test_Engine()
 new_test.prompt_user()
+
+chess_shelve.sync()
+chess_shelve.close('moves')
