@@ -7,7 +7,18 @@ from node import Node
 import heuristics
 import random
 import time
+import json
 
+# open JSON file to read cached oves
+with open("/Users/lamesjim/galvanize/Chess-AI/moves_cache.json", "r") as f:
+    try:
+        cache_moves = json.load(f)
+        # if the file is empty the ValueError will be thrown
+    except ValueError:
+        cache_moves = {'even': {}, 'odd': {}}
+
+even_moves = cache_moves['even']
+odd_moves = cache_moves['odd']
 
 # Magenta = '\033[95m'
 # Blue = '\033[94m'
@@ -72,6 +83,16 @@ class Test_Engine():
             captured = self.captured_pieces(str(self.game))
             self.computer.print_board(str(self.game), captured)
         user_move = raw_input("Game over. Play again? y/n: ")
+        # cache moves into JSON file
+        with open("/Users/lamesjim/galvanize/Chess-AI/moves_cache.json", "w") as f:
+            if self.computer.max_depth % 2 == 0:
+                for key in self.computer.cache:
+                    cache_moves["even"][key] = self.computer.cache[key]
+                json.dump(cache_moves, f)
+            else:
+                for key in self.computer.cache:
+                    cache_moves["odd"][key] = self.computer.cache[key]
+                json.dump(cache_moves, f)
         if user_move.lower() == "y":
             self.game = Game()
             self.computer.game = self.game
@@ -101,7 +122,10 @@ class AI():
         self.leaf_nodes = heuristic_gen(leaf_nodes)
         self.game = game
         self.node_count = node_count
-        self.cache = {}
+        if self.max_depth % 2 == 0:
+            self.cache = cache_moves['even']
+        else:
+            self.cache = cache_moves['odd']
         self.found_in_cache = 0
 
     def print_board(self, board_state, captured={"w": [], "b": []}):
