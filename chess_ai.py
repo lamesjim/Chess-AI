@@ -7,7 +7,6 @@ from node import Node
 import heuristics
 import random
 import time
-import shelve
 
 class bcolors:
     HEADER = '\033[95m'
