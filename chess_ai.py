@@ -10,7 +10,7 @@ import time
 import json
 
 # open JSON file to read cached oves
-with open("/Users/lamesjim/galvanize/Chess-AI/moves_cache.json", "r") as f:
+with open("./moves_cache.json", "r") as f:
     try:
         cache_moves = json.load(f)
         # if the file is empty the ValueError will be thrown
@@ -45,58 +45,73 @@ class Test_Engine():
         print("\033[94m===================================================================\033[0m\033[22m")
         print("\nWelcome! To play, enter a command, e.g. '\033[95me2e4\033[0m'. To quit, type '\033[91mff\033[0m'.")
         self.computer.print_board(str(self.game))
-        while self.game.status < 2:
-            user_move = raw_input("\nMake a move: \033[95m")
-            print("\033[0m")
-            while user_move not in self.game.get_moves() and user_move != "ff":
-                user_move = raw_input("Please enter a valid move: ")
-            if user_move == "ff":
-                print("You surrendered.")
-                break;
-            self.game.apply_move(user_move)
-            captured = self.captured_pieces(str(self.game))
-            start_time = time.time()
-            self.computer.print_board(str(self.game), captured)
-            print("\nCalculating...\n")
-            if self.game.status < 2:
-                current_state = str(self.game)
-                computer_move = self.computer.ab_make_move(current_state)
-                PIECE_NAME = {'p': 'pawn', 'b': 'bishop', 'n': 'knight', 'r': 'rook', 'q': 'queen', 'k': 'king'}
-                start = computer_move[:2]
-                end = computer_move[2:4]
-                piece = PIECE_NAME[self.game.board.get_piece(self.game.xy2i(computer_move[:2]))]
-                captured_piece = self.game.board.get_piece(self.game.xy2i(computer_move[2:4]))
-                if captured_piece != " ":
-                    captured_piece = PIECE_NAME[captured_piece.lower()]
-                    print("---------------------------------")
-                    print("Computer's \033[92m{piece}\033[0m at \033[92m{start}\033[0m captured \033[91m{captured_piece}\033[0m at \033[91m{end}\033[0m.").format(piece = piece, start = start, captured_piece = captured_piece, end = end)
-                    print("---------------------------------")
+        try:
+            while self.game.status < 2:
+                user_move = raw_input("\nMake a move: \033[95m")
+                print("\033[0m")
+                while user_move not in self.game.get_moves() and user_move != "ff":
+                    user_move = raw_input("Please enter a valid move: ")
+                if user_move == "ff":
+                    print("You surrendered.")
+                    break;
+                self.game.apply_move(user_move)
+                captured = self.captured_pieces(str(self.game))
+                start_time = time.time()
+                self.computer.print_board(str(self.game), captured)
+                print("\nCalculating...\n")
+                if self.game.status < 2:
+                    current_state = str(self.game)
+                    computer_move = self.computer.ab_make_move(current_state)
+                    PIECE_NAME = {'p': 'pawn', 'b': 'bishop', 'n': 'knight', 'r': 'rook', 'q': 'queen', 'k': 'king'}
+                    start = computer_move[:2]
+                    end = computer_move[2:4]
+                    piece = PIECE_NAME[self.game.board.get_piece(self.game.xy2i(computer_move[:2]))]
+                    captured_piece = self.game.board.get_piece(self.game.xy2i(computer_move[2:4]))
+                    if captured_piece != " ":
+                        captured_piece = PIECE_NAME[captured_piece.lower()]
+                        print("---------------------------------")
+                        print("Computer's \033[92m{piece}\033[0m at \033[92m{start}\033[0m captured \033[91m{captured_piece}\033[0m at \033[91m{end}\033[0m.").format(piece = piece, start = start, captured_piece = captured_piece, end = end)
+                        print("---------------------------------")
+                    else:
+                        print("---------------------------------")
+                        print("Computer moved \033[92m{piece}\033[0m at \033[92m{start}\033[0m to \033[92m{end}\033[0m.".format(piece = piece, start = start, end = end))
+                        print("---------------------------------")
+                    print("\033[1mNodes visited:\033[0m        \033[93m{}\033[0m".format(self.computer.node_count))
+                    print("\033[1mNodes cached:\033[0m         \033[93m{}\033[0m".format(len(self.computer.cache)))
+                    print("\033[1mNodes found in cache:\033[0m \033[93m{}\033[0m".format(self.computer.found_in_cache))
+                    print("\033[1mElapsed time in sec:\033[0m  \033[93m{time}\033[0m".format(time=time.time() - start_time))
+                    self.game.apply_move(computer_move)
+                captured = self.captured_pieces(str(self.game))
+                self.computer.print_board(str(self.game), captured)
+            user_move = raw_input("Game over. Play again? y/n: ")
+            if user_move.lower() == "y":
+                self.game = Game()
+                self.computer.game = self.game
+                self.prompt_user()
+            # cache moves into JSON file
+            with open("./moves_cache.json", "w") as f:
+                if self.computer.max_depth % 2 == 0:
+                    for key in self.computer.cache:
+                        cache_moves["even"][key] = self.computer.cache[key]
+                    json.dump(cache_moves, f)
                 else:
-                    print("---------------------------------")
-                    print("Computer moved \033[92m{piece}\033[0m at \033[92m{start}\033[0m to \033[92m{end}\033[0m.".format(piece = piece, start = start, end = end))
-                    print("---------------------------------")
-                print("\033[1mNodes visited:\033[0m        \033[93m{}\033[0m".format(self.computer.node_count))
-                print("\033[1mNodes cached:\033[0m         \033[93m{}\033[0m".format(len(self.computer.cache)))
-                print("\033[1mNodes found in cache:\033[0m \033[93m{}\033[0m".format(self.computer.found_in_cache))
-                print("\033[1mElapsed time in sec:\033[0m  \033[93m{time}\033[0m".format(time=time.time() - start_time))
-                self.game.apply_move(computer_move)
-            captured = self.captured_pieces(str(self.game))
-            self.computer.print_board(str(self.game), captured)
-        user_move = raw_input("Game over. Play again? y/n: ")
-        # cache moves into JSON file
-        with open("/Users/lamesjim/galvanize/Chess-AI/moves_cache.json", "w") as f:
-            if self.computer.max_depth % 2 == 0:
-                for key in self.computer.cache:
-                    cache_moves["even"][key] = self.computer.cache[key]
-                json.dump(cache_moves, f)
-            else:
-                for key in self.computer.cache:
-                    cache_moves["odd"][key] = self.computer.cache[key]
-                json.dump(cache_moves, f)
-        if user_move.lower() == "y":
-            self.game = Game()
-            self.computer.game = self.game
-            self.prompt_user()
+                    for key in self.computer.cache:
+                        cache_moves["odd"][key] = self.computer.cache[key]
+                    json.dump(cache_moves, f)
+        except KeyboardInterrupt:
+            with open("./moves_cache.json", "w") as f:
+                if self.computer.max_depth % 2 == 0:
+                    for key in self.computer.cache:
+                        cache_moves["even"][key] = self.computer.cache[key]
+                    json.dump(cache_moves, f)
+                else:
+                    for key in self.computer.cache:
+                        cache_moves["odd"][key] = self.computer.cache[key]
+                    json.dump(cache_moves, f)
+            print("\nYou quitter!")
+
+    # def write_to_cache(self):
+
 
     def captured_pieces(self, board_state):
         piece_tracker = {'P': 8, 'B': 2, 'N': 2, 'R': 2, 'Q': 1, 'K': 1, 'p': 8, 'b': 2, 'n': 2, 'r': 2, 'q': 1, 'k': 1}
