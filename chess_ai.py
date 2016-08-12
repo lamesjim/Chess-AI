@@ -29,7 +29,7 @@ odd_moves = cache_moves['odd']
 # Bold = '\033[1m'
 # Underline = '\033[4m'
 
-class Test_Engine():
+class Game_Engine():
     def __init__(self):
         self.game = Game()
         self.computer = AI(self.game, 4)
@@ -372,5 +372,5 @@ class AI():
     #
     # unittest.main()
 
-new_test = Test_Engine()
+new_test = Game_Engine()
 new_test.prompt_user()
