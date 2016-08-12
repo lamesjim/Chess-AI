@@ -14,31 +14,71 @@ class Test_Engine():
         self.computer = AI(self.game, 4)
 
     def prompt_user(self):
-        self.computer.print_board()
+        print("===================================================================")
+        print ("               ______________                     \n"
+               "               __  ____/__  /_____________________\n"
+               "               _  /    __  __ \  _ \_  ___/_  ___/\n"
+               "               / /___  _  / / /  __/(__  )_(__  ) \n"
+               "               \____/  /_/ /_/\___//____/ /____/  \n"
+               "                                                  ")
+        print("===================================================================")
+        print("\nWelcome! To play, enter a command, e.g. 'e2e4'. To quit, type 'ff'.")
+        self.computer.print_board(str(self.game))
         while self.game.status < 2:
-            user_move = raw_input("Make a move: ")
+            user_move = raw_input("\nMake a move: ")
             while user_move not in self.game.get_moves() and user_move != "ff":
                 user_move = raw_input("Please enter a valid move: ")
             if user_move == "ff":
                 print("You surrendered.")
                 break;
             self.game.apply_move(user_move)
+            captured = self.captured_pieces(str(self.game))
             start_time = time.time()
-            self.computer.print_board()
+            self.computer.print_board(str(self.game), captured)
             print("\nCalculating...\n")
             if self.game.status < 2:
                 current_state = str(self.game)
                 computer_move = self.computer.ab_make_move(current_state)
-                PIECE_NAME = {'p': 'Pawn', 'b': 'Bishop', 'n': 'Knight', 'r': 'Rook', 'q': 'Queen', 'k': 'King'}
-                print("Computer moved {piece} at {start} to {end}".format(piece = PIECE_NAME[self.game.board.get_piece(self.game.xy2i(computer_move[:2]))], start = computer_move[:2], end = computer_move[2:4]))
+                PIECE_NAME = {'p': 'pawn', 'b': 'bishop', 'n': 'knight', 'r': 'rook', 'q': 'queen', 'k': 'king'}
+                start = computer_move[:2]
+                end = computer_move[2:4]
+                piece = PIECE_NAME[self.game.board.get_piece(self.game.xy2i(computer_move[:2]))]
+                captured_piece = self.game.board.get_piece(self.game.xy2i(computer_move[2:4]))
+                if captured_piece != " ":
+                    captured_piece = PIECE_NAME[captured_piece.lower()]
+                    print("Computer's {piece} at {start} captured {captured_piece} at {end}.").format(piece = piece, start = start, captured_piece = captured_piece, end = end)
+                else:
+                    print("Computer moved {piece} at {start} to {end}.".format(piece = piece, start = start, end = end))
+                print("Nodes visited: {}".format(self.computer.node_count))
+                print("Nodes cached: {}".format(len(self.computer.cache)))
+                print("Nodes found in cache: {}".format(self.computer.found_in_cache))
+                print("Elapsed time in sec: {time}".format(time=time.time() - start_time))
                 self.game.apply_move(computer_move)
-            self.computer.print_board()
-            print("Elapsed time in sec: {time}".format(time=time.time() - start_time))
+            captured = self.captured_pieces(str(self.game))
+            self.computer.print_board(str(self.game), captured)
         user_move = raw_input("Game over. Play again? y/n: ")
         if user_move.lower() == "y":
             self.game = Game()
             self.computer.game = self.game
             self.prompt_user()
+
+    def captured_pieces(self, board_state):
+        piece_tracker = {'P': 8, 'B': 2, 'N': 2, 'R': 2, 'Q': 1, 'K': 1, 'p': 8, 'b': 2, 'n': 2, 'r': 2, 'q': 1, 'k': 1}
+        captured = {
+            "w": [],
+            "b": []
+        }
+        for char in board_state.split()[0]:
+            if char in piece_tracker:
+                piece_tracker[char] -= 1
+        for piece in piece_tracker:
+            if piece_tracker[piece] > 0:
+                if piece.isupper():
+                    captured['w'] += piece_tracker[piece] * piece
+                else:
+                    captured['b'] += piece_tracker[piece] * piece
+            piece_tracker[piece] = 0
+        return captured
 
 class AI():
     def __init__(self, game, max_depth=4, leaf_nodes=[], node_count=0):
@@ -49,12 +89,12 @@ class AI():
         self.cache = {}
         self.found_in_cache = 0
 
-    def print_board(self, board_state=None):
+    def print_board(self, board_state, captured={"w": [], "b": []}):
         PIECE_SYMBOLS = {'P': '♟', 'B': '♝', 'N': '♞', 'R': '♜', 'Q': '♛', 'K': '♚', 'p': '♙', 'b': '♗', 'n': '♘', 'r': '♖', 'q': '♕', 'k': '♔'}
-        if board_state == None:
-            board_state = str(self.game)
         board_state = board_state.split()[0].split("/")
         board_state_str = "\n"
+        white_captured = " ".join(PIECE_SYMBOLS[piece] for piece in captured['w'])
+        black_captured = " ".join(PIECE_SYMBOLS[piece] for piece in captured['b'])
         for i, row in enumerate(board_state):
             board_state_str += str(8-i)
             for char in row:
@@ -62,12 +102,16 @@ class AI():
                     board_state_str += " ♢" * int(char)
                 else:
                     board_state_str += " " + PIECE_SYMBOLS[char]
+            if i == 0:
+                board_state_str += "   Captured:" if len(white_captured) > 0 else ""
+            if i == 1:
+                board_state_str += "   " + white_captured
+            if i == 6:
+                board_state_str += "   Captured:" if len(black_captured) > 0 else ""
+            if i == 7:
+                board_state_str += "   " + black_captured
             board_state_str += "\n"
         board_state_str += "  A B C D E F G H"
-
-        print("Node Count: {}".format(self.node_count))
-        print("Cache size: {}".format(len(self.cache)))
-        print("Found in Cache: {}".format(self.found_in_cache))
         self.found_in_cache = 0
         self.node_count = 0
         print(board_state_str)

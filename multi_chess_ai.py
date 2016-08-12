@@ -142,7 +142,7 @@ class AI():
         best_move = None
 
         p = Pool(4)
-        result = p.map(map_partial, possible_moves)
+        result = p.map(map_partial, possible_moves, )
         for node in result:
             if best_move == None:
                 best_move = node
