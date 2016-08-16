@@ -59,11 +59,13 @@ In an actual chess game, the each depth would have many more branches with each 
 
 ## Alpha-Beta Pruning
 
-Because of the number of board states possible in chess (estimated to be [10^120](https://en.wikipedia.org/wiki/Shannon_number)), minimax can be improved with a layer of [alpha-beta pruning](https://en.wikipedia.org/wiki/Alpha%E2%80%93beta_pruning). By keeping track of alpha (the highest value guaranteed to the maximizer) and beta (the highest value value guaranteed to the minimizer), it is possible to avoid calculating the heuristics of certain board states that can not change the alpha-beta values.
+Because of the number of board states possible in chess (estimated to be [10^120](https://en.wikipedia.org/wiki/Shannon_number)), minimax can be improved with a layer of [alpha-beta pruning](https://en.wikipedia.org/wiki/Alpha%E2%80%93beta_pruning). By keeping track of alpha (the highest value guaranteed to the maximizer) and beta (the highest value guaranteed to the minimizer), it is possible to avoid calculating the heuristics of certain board states that improve the situation for the current player.
 
 ![Alpha-Beta Pruning Diagram](https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/AB_pruning.svg/1212px-AB_pruning.svg.png "Alpha-Beta Pruning Diagram")
 
-The grayed-out leaf node with the 5 is never explored because the maximizer, at this point, is guaranteed a 5 by going left and can do no better than 4 by going right. That is, if the value of the leaf node is greater than 4, the minimizer would choose the 4. If it were less than 4, the minimizer would choose it instead. From the maximizer's perspective, there is no reason to investigate that node.
+The grayed-out leaf node with the 5 is never explored because the maximizer, at this point, is guaranteed a 5 by going left and can do no better than 4 by going right. That is, if the value of the leaf node is greater than 4, the minimizer would choose the 4. If it were less than 4, the minimizer would choose it instead. From the maximizer's perspective, there is no reason to investigate that leaf node.
+
+For more information on the history of chess, minimax, and alpha-beta pruning, check out Patrick Winston's [lecture](https://www.youtube.com/watch?v=STjW3eH0Cik).
 
 ## Heuristics
 
