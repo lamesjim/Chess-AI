@@ -11,71 +11,41 @@ Currently trying to implement multiprocessing as our recursive function uses a l
 
 ## Getting Started
 
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
+These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
 
 ### Prerequisities
 
-What things you need to install the software and how to install them
-
-```
-Give examples
-```
+1. [Python 2](https://www.python.org/downloads/)
+2. [Virtualenv](https://virtualenv.pypa.io/en/stable/installation/)
+3. [PyPy](http://pypy.org/download.html) (Python2.7 compatible)
 
 ### Installing
 
-A step by step series of examples that tell you have to get a development env running
-
-Stay what the step will be
+After installing the prerequisites and cloning this repo, go into the repo and create a virtual env:
 
 ```
-Give the example
+virtualenv env
 ```
 
-And repeat
+Activate the env:
 
 ```
-until finished
+source env/bin/activate
 ```
 
-End with an example of getting some data out of the system or using it for a little demo
-
-## Running the tests
-
-Explain how to run the automated tests for this system
-
-### Break down into end to end tests
-
-Explain what these tests test and why
+Install the dependencies:
 
 ```
-Give an example
+pip install -r requirements.txt
 ```
 
-### And coding style tests
-
-Explain what these tests test and why
+Run the game with:
 
 ```
-Give an example
+python chess_ai.py
 ```
 
-## Deployment
-
-Add additional notes about how to deploy this on a live system
-
-## Built With
-
-* Dropwizard - Bla bla bla
-* Maven - Maybe
-* Atom - ergaerga
-
-## Contributing
-
-Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct, and the process for submitting pull requests to us.
-
-## Versioning
-
-We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/your/project/tags).
+It is HIGHLY recommended that you run ```chess_ai.py``` with PyPy to greatly reduce computation time.
 
 ## Authors
 
