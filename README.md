@@ -67,7 +67,7 @@ For more information on the history of chess, minimax, and alpha-beta pruning, c
 
 ## Heuristics
 
-(not yet added)
+There are s
 
 ## Authors
 
