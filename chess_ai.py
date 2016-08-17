@@ -237,7 +237,6 @@ class AI():
                 best_move = move
         # best_move at this point stores the move with the highest heuristic
         return best_move
-
     def ab_make_move(self, board_state):
         possible_moves = self.get_moves(board_state)
         alpha = float("-inf")
@@ -372,5 +371,6 @@ class AI():
     #
     # unittest.main()
 
-new_test = Game_Engine()
-new_test.prompt_user()
+if __name__ == '__main__':
+    new_test = Game_Engine()
+    new_test.prompt_user()
