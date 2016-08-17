@@ -30,8 +30,8 @@ odd_moves = cache_moves['odd']
 # Underline = '\033[4m'
 
 class Game_Engine():
-    def __init__(self):
-        self.game = Game()
+    def __init__(self, board_state):
+        self.game = Game(board_state)
         self.computer = AI(self.game, 4)
 
     def prompt_user(self):
