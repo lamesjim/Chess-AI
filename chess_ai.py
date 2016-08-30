@@ -32,7 +32,7 @@ odd_moves = cache_moves['odd']
 class Game_Engine():
     def __init__(self, board_state):
         self.game = Game(board_state)
-        self.computer = AI(self.game, 3)
+        self.computer = AI(self.game, 5)
 
     def prompt_user(self):
         print("\033[94m\033[1m===================================================================")
