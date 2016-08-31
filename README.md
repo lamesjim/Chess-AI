@@ -1,5 +1,7 @@
 # Chess AI
 
+![Chess AI Terminal Screenshot](https://github.com/jameslim1021/Chess-AI/blob/master/screenshots/chessai.png)
+
 This project focuses on computer science concepts such as data structures and algorithms. Chessnut is the chess engine we are using for all the moves and chess logic. We are utilizing a tree to generate the possible chessboards 3 levels deep and depth first search, minimax, and alpha-beta pruning to find the best move based on the following heuristics:
 
 * material (total piece count for each player)
