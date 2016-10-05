@@ -95,7 +95,7 @@ For more ideas about chess heuristics, check out this [article](https://www.quor
 ## Authors
 
 * **Ian Jabour** - [l4nk332](https://github.com/l4nk332)
-* **James Lim** - [jameslim1021](https://github.com/jameslim1021)
+* **James Lim** - [jameslim1021](https://github.com/lamesjim)
 * **Dai Nguyen** - [dnguyen87](https://github.com/dnguyen87)
 
 ## License
