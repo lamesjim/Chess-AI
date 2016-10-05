@@ -372,5 +372,5 @@ class AI():
     # unittest.main()
 
 if __name__ == '__main__':
-    new_test = Game_Engine()
+    new_test = Game_Engine('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1')
     new_test.prompt_user()
