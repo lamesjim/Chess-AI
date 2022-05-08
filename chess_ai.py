@@ -235,8 +235,8 @@ class AI():
         for move in possible_moves:
             if move.value > best_move.value:
                 best_move = move
+        return best_move.algebraic_move
         # best_move at this point stores the move with the highest heuristic
-        return best_move
     def ab_make_move(self, board_state):
         possible_moves = self.get_moves(board_state)
         alpha = float("-inf")
@@ -259,8 +259,37 @@ class AI():
                 # pick largest number, where root is black and even depth
                 if (alpha < board_value):
                     alpha = board_value
+            else:
+                # pick smallest number, where root is white and odd depth
+                if (beta > board_value):
+                    beta = board_value
+                return board_value
+        if current_depth % 2 == 0:
+            # min player's turn
+            self.is_turn = False
+            for child_node in self.get_moves(node.board_state, self.is_turn):
+                board_value = self.ab_minimax(child_node, alpha, beta, current_depth)
+                if alpha < board_value:
+                    alpha = board_value
+                    if current_depth == self.max_depth:
+                        child_node.value = alpha
+                if alpha >= beta:
+                    return alpha
+        else:
+            # max player's turn
+            self.is_turn = True
+            for child_node in self.get_moves(node.board_state, self.is_turn):
+                board_value = self.ab_minimax(child_node, alpha, beta, current_depth)
                 self.node_count += 1
-                return alpha
+                if beta > board_value:
+                    beta = board_value
+                    if current_depth == self.max_depth:
+                        child_node.value = beta
+                if alpha >= beta:
+                    return beta
+                    return alpha if current_depth % 2 == 0 else beta
+
+
             else:
                 # pick smallest number, where root is black and odd depth
                 if (beta > board_value):
